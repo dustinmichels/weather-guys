@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
+import AIResponse from './components/AIResponse.vue'
+import AnimatedCharacter from './components/AnimatedCharacter.vue'
 import { useAI } from './composables/useAI'
 import { useLocation } from './composables/useLocation'
 
@@ -11,9 +13,12 @@ const weather = ref<any>(null)
 const weatherLoading = ref(false)
 const weatherError = ref<string | null>(null)
 
-// Initialize AI service with API key
-const apiKey = import.meta.env.VITE_GOOGLE_AI_KEY
-initializeAI(apiKey)
+// Initialize on mount
+onMounted(() => {
+  // Initialize AI service with API key
+  const apiKey = import.meta.env.VITE_GOOGLE_AI_KEY
+  initializeAI(apiKey)
+})
 
 const fetchWeather = async (lat: number, lon: number) => {
   weatherLoading.value = true
@@ -210,10 +215,13 @@ const getWeatherIcon = (code: number): string => {
                 </div>
               </div>
 
-              <!-- AI Response -->
-              <div v-if="aiResponse" class="box has-background-success-light mt-4">
-                <div class="content has-text-left">
-                  <p>{{ aiResponse }}</p>
+              <!-- AI Response with Character -->
+              <div v-if="aiResponse" class="columns is-variable is-4">
+                <div class="column is-narrow">
+                  <AnimatedCharacter />
+                </div>
+                <div class="column">
+                  <AIResponse :response="aiResponse" />
                 </div>
               </div>
             </div>

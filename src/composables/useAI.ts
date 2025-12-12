@@ -29,6 +29,23 @@ export const useAI = () => {
       return
     }
 
+    // Check if MOCK mode is enabled
+    const isMockMode = import.meta.env.VITE_MOCK === 'true'
+
+    if (isMockMode) {
+      aiLoading.value = true
+      aiResponse.value = null
+
+      // Simulate a brief delay to mimic API call
+      await new Promise((resolve) => setTimeout(resolve, 500))
+
+      const mockResponse = `Oh, you're from ${location}. That means you probably cycle everywhere in a tweed jacket, argue about the correct pronunciation of "scone," and have a punt with a tragic love story attached to it.`
+      aiResponse.value = mockResponse
+
+      aiLoading.value = false
+      return
+    }
+
     if (!aiService.value) {
       aiResponse.value = ERROR_MESSAGES.AI_NOT_INITIALIZED
       return
