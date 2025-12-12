@@ -2,6 +2,7 @@
 import { GoogleGenAI } from '@google/genai'
 import { ref } from 'vue'
 import { getCityFromResult, getFullLocationFromResult, reverseGeocode } from './geocoding'
+import { LOCATION_STEREOTYPE_PROMPT } from './prompts'
 
 const location = ref<{ latitude: number; longitude: number } | null>(null)
 const city = ref<string | null>(null)
@@ -65,11 +66,13 @@ const useAI = async () => {
     const ai = new GoogleGenAI({ apiKey })
 
     const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
-      contents: `Tell me 3 interesting facts about ${city.value} in a few sentences.`,
+      model: 'gemini-2.0-flash-exp',
+      contents: `${LOCATION_STEREOTYPE_PROMPT}
+
+Location Input: ${city.value}`,
     })
 
-    aiResponse.value = response.text
+    aiResponse.value = response.text ?? null
   } catch (err) {
     aiResponse.value = `Error getting AI response: ${err instanceof Error ? err.message : 'Unknown error'}`
     console.error('AI Error:', err)
@@ -80,172 +83,93 @@ const useAI = async () => {
 </script>
 
 <template>
-  <div class="container">
-    <h1>Location Finder</h1>
+  <section class="section">
+    <div class="container">
+      <div class="columns is-centered">
+        <div class="column is-8-tablet is-6-desktop">
+          <div class="box has-text-centered">
+            <h1 class="title is-2 has-text-primary mb-5">Location Finder</h1>
 
-    <button @click="getLocation" :disabled="loading" class="ready-btn">
-      {{ loading ? 'Getting location...' : 'Ready?' }}
-    </button>
+            <button
+              @click="getLocation"
+              :disabled="loading"
+              class="button is-primary is-large is-fullwidth"
+              :class="{ 'is-loading': loading }"
+            >
+              <span class="icon">
+                <i class="fas fa-location-dot"></i>
+              </span>
+              <span>{{ loading ? 'Getting location...' : 'Ready?' }}</span>
+            </button>
 
-    <div v-if="error" class="error">
-      {{ error }}
-    </div>
+            <div v-if="error" class="notification is-danger mt-4">
+              <button class="delete" @click="error = null"></button>
+              {{ error }}
+            </div>
 
-    <div v-if="location" class="location-info">
-      <h2>Your Location:</h2>
+            <div v-if="location" class="mt-5">
+              <div v-if="city" class="box has-background-primary-light">
+                <div class="content">
+                  <p class="title is-4 has-text-primary mb-2">
+                    <span class="icon">
+                      <i class="fas fa-map-marker-alt"></i>
+                    </span>
+                    {{ city }}
+                  </p>
+                  <p class="subtitle is-6 has-text-grey">{{ fullLocation }}</p>
 
-      <div v-if="city" class="city-display">
-        <p class="city-name">📍 {{ city }}</p>
-        <p class="full-location">{{ fullLocation }}</p>
+                  <button
+                    @click="useAI"
+                    :disabled="aiLoading"
+                    class="button is-info is-medium is-fullwidth mt-4"
+                    :class="{ 'is-loading': aiLoading }"
+                  >
+                    <span class="icon">
+                      <i class="fas fa-robot"></i>
+                    </span>
+                    <span>{{ aiLoading ? 'AI is thinking...' : 'Use AI 🤖' }}</span>
+                  </button>
 
-        <button @click="useAI" :disabled="aiLoading" class="ai-btn">
-          {{ aiLoading ? 'AI is thinking...' : 'Use AI 🤖' }}
-        </button>
+                  <div v-if="aiResponse" class="notification is-info is-light mt-4 has-text-left">
+                    <p class="title is-5 has-text-info mb-3">
+                      <span class="icon">
+                        <i class="fas fa-sparkles"></i>
+                      </span>
+                      AI Insights:
+                    </p>
+                    <div class="content">
+                      <p>{{ aiResponse }}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
 
-        <div v-if="aiResponse" class="ai-response">
-          <h3>AI Insights:</h3>
-          <p>{{ aiResponse }}</p>
+              <div class="box mt-4">
+                <div class="content has-text-left">
+                  <p class="has-text-weight-semibold">
+                    <span class="icon has-text-info">
+                      <i class="fas fa-globe"></i>
+                    </span>
+                    Coordinates:
+                  </p>
+                  <p class="mb-2">
+                    <span class="has-text-weight-bold">Latitude:</span>
+                    {{ location.latitude.toFixed(6) }}
+                  </p>
+                  <p class="mb-0">
+                    <span class="has-text-weight-bold">Longitude:</span>
+                    {{ location.longitude.toFixed(6) }}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-
-      <div class="coordinates">
-        <p><strong>Latitude:</strong> {{ location.latitude.toFixed(6) }}</p>
-        <p><strong>Longitude:</strong> {{ location.longitude.toFixed(6) }}</p>
-      </div>
     </div>
-  </div>
+  </section>
 </template>
 
 <style scoped>
-.container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 100vh;
-  padding: 2rem;
-}
-
-h1 {
-  margin-bottom: 2rem;
-  color: #42b983;
-}
-
-.ready-btn {
-  padding: 1rem 2rem;
-  font-size: 1.2rem;
-  font-weight: bold;
-  color: white;
-  background-color: #42b983;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.ready-btn:hover:not(:disabled) {
-  background-color: #359268;
-  transform: scale(1.05);
-}
-
-.ready-btn:disabled {
-  background-color: #a0a0a0;
-  cursor: not-allowed;
-}
-
-.error {
-  margin-top: 1rem;
-  padding: 1rem;
-  background-color: #fee;
-  color: #c33;
-  border-radius: 4px;
-  border-left: 4px solid #c33;
-}
-
-.location-info {
-  margin-top: 2rem;
-  padding: 1.5rem;
-  background-color: #f0f9ff;
-  border-radius: 8px;
-  border: 2px solid #42b983;
-  text-align: left;
-  min-width: 320px;
-}
-
-.location-info h2 {
-  margin-top: 0;
-  margin-bottom: 1rem;
-  color: #42b983;
-}
-
-.city-display {
-  margin-bottom: 1.5rem;
-  padding-bottom: 1.5rem;
-  border-bottom: 1px solid #42b98333;
-}
-
-.city-name {
-  font-size: 1.5rem;
-  font-weight: bold;
-  color: #2c3e50;
-  margin: 0 0 0.5rem 0;
-}
-
-.full-location {
-  color: #666;
-  margin: 0;
-  font-size: 0.95rem;
-}
-
-.coordinates p {
-  margin: 0.5rem 0;
-  font-size: 0.9rem;
-  color: #555;
-}
-
-.ai-btn {
-  margin-top: 1rem;
-  padding: 0.75rem 1.5rem;
-  font-size: 1rem;
-  font-weight: bold;
-  color: white;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  width: 100%;
-}
-
-.ai-btn:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
-}
-
-.ai-btn:disabled {
-  background: linear-gradient(135deg, #a0a0a0 0%, #808080 100%);
-  cursor: not-allowed;
-  transform: none;
-}
-
-.ai-response {
-  margin-top: 1rem;
-  padding: 1rem;
-  background-color: #f8f4ff;
-  border-radius: 8px;
-  border-left: 4px solid #667eea;
-}
-
-.ai-response h3 {
-  margin-top: 0;
-  margin-bottom: 0.5rem;
-  color: #667eea;
-  font-size: 1.1rem;
-}
-
-.ai-response p {
-  margin: 0;
-  color: #333;
-  line-height: 1.6;
-}
+/* Optional: Add any custom styles here if needed */
 </style>

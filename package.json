@@ -15,6 +15,7 @@
     "format": "prettier --write --experimental-cli src/"
   },
   "dependencies": {
+    "@fortawesome/fontawesome-free": "^7.1.0",
     "@google/genai": "^1.33.0",
     "bulma": "^1.0.4",
     "vue": "^3.5.25"
