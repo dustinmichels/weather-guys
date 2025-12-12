@@ -1,83 +1,19 @@
 <script setup lang="ts">
-import { GoogleGenAI } from '@google/genai'
-import { ref } from 'vue'
-import { getCityFromResult, getFullLocationFromResult, reverseGeocode } from './geocoding'
-import { LOCATION_STEREOTYPE_PROMPT } from './prompts'
+import { useAI } from './composables/useAI'
+import { useLocation } from './composables/useLocation'
 
-const location = ref<{ latitude: number; longitude: number } | null>(null)
-const city = ref<string | null>(null)
-const fullLocation = ref<string | null>(null)
-const error = ref<string | null>(null)
-const loading = ref(false)
-const aiLoading = ref(false)
-const aiResponse = ref<string | null>(null)
+const { location, city, fullLocation, error, loading, getLocation, clearError } = useLocation()
 
-const getLocation = () => {
-  if (!navigator.geolocation) {
-    error.value = 'Geolocation is not supported by your browser'
-    return
-  }
+const { aiResponse, aiLoading, initializeAI, generateResponse } = useAI()
 
-  loading.value = true
-  error.value = null
-  city.value = null
-  fullLocation.value = null
+// Initialize AI service with API key
+const apiKey = import.meta.env.VITE_GOOGLE_AI_KEY
+initializeAI(apiKey)
 
-  navigator.geolocation.getCurrentPosition(
-    async (position) => {
-      location.value = {
-        latitude: position.coords.latitude,
-        longitude: position.coords.longitude,
-      }
-
-      // Reverse geocode to get city name
-      const result = await reverseGeocode(position.coords.latitude, position.coords.longitude)
-
-      if (result) {
-        city.value = getCityFromResult(result)
-        fullLocation.value = getFullLocationFromResult(result)
-      }
-
-      loading.value = false
-    },
-    (err) => {
-      error.value = `Error: ${err.message}`
-      loading.value = false
-    },
-  )
-}
-
-const useAI = async () => {
-  if (!city.value) return
-
-  // Check if API key is configured
-  const apiKey = import.meta.env.VITE_GOOGLE_AI_KEY
-
-  if (!apiKey || apiKey === 'your_api_key_here') {
-    aiResponse.value =
-      '⚠️ Please set your VITE_GOOGLE_AI_KEY in the .env file. Get your API key from https://ai.google.dev/'
-    return
-  }
-
-  aiLoading.value = true
-  aiResponse.value = null
-
-  try {
-    const ai = new GoogleGenAI({ apiKey })
-
-    const response = await ai.models.generateContent({
-      model: 'gemini-2.0-flash-exp',
-      contents: `${LOCATION_STEREOTYPE_PROMPT}
-
-Location Input: ${city.value}`,
-    })
-
-    aiResponse.value = response.text ?? null
-  } catch (err) {
-    aiResponse.value = `Error getting AI response: ${err instanceof Error ? err.message : 'Unknown error'}`
-    console.error('AI Error:', err)
-  } finally {
-    aiLoading.value = false
+const handleReady = async () => {
+  await getLocation()
+  if (city.value) {
+    await generateResponse(city.value)
   }
 }
 </script>
@@ -91,19 +27,19 @@ Location Input: ${city.value}`,
             <h1 class="title is-2 has-text-primary mb-5">Location Finder</h1>
 
             <button
-              @click="getLocation"
-              :disabled="loading"
+              @click="handleReady"
+              :disabled="loading || aiLoading"
               class="button is-primary is-large is-fullwidth"
-              :class="{ 'is-loading': loading }"
+              :class="{ 'is-loading': loading || aiLoading }"
             >
               <span class="icon">
                 <i class="fas fa-location-dot"></i>
               </span>
-              <span>{{ loading ? 'Getting location...' : 'Ready?' }}</span>
+              <span>{{ loading || aiLoading ? 'Processing...' : 'Ready?' }}</span>
             </button>
 
             <div v-if="error" class="notification is-danger mt-4">
-              <button class="delete" @click="error = null"></button>
+              <button class="delete" @click="clearError"></button>
               {{ error }}
             </div>
 
@@ -118,48 +54,16 @@ Location Input: ${city.value}`,
                   </p>
                   <p class="subtitle is-6 has-text-grey">{{ fullLocation }}</p>
 
-                  <button
-                    @click="useAI"
-                    :disabled="aiLoading"
-                    class="button is-info is-medium is-fullwidth mt-4"
-                    :class="{ 'is-loading': aiLoading }"
-                  >
-                    <span class="icon">
-                      <i class="fas fa-robot"></i>
-                    </span>
-                    <span>{{ aiLoading ? 'AI is thinking...' : 'Use AI 🤖' }}</span>
-                  </button>
-
                   <div v-if="aiResponse" class="notification is-info is-light mt-4 has-text-left">
                     <p class="title is-5 has-text-info mb-3">
                       <span class="icon">
                         <i class="fas fa-sparkles"></i>
                       </span>
-                      AI Insights:
                     </p>
                     <div class="content">
                       <p>{{ aiResponse }}</p>
                     </div>
                   </div>
-                </div>
-              </div>
-
-              <div class="box mt-4">
-                <div class="content has-text-left">
-                  <p class="has-text-weight-semibold">
-                    <span class="icon has-text-info">
-                      <i class="fas fa-globe"></i>
-                    </span>
-                    Coordinates:
-                  </p>
-                  <p class="mb-2">
-                    <span class="has-text-weight-bold">Latitude:</span>
-                    {{ location.latitude.toFixed(6) }}
-                  </p>
-                  <p class="mb-0">
-                    <span class="has-text-weight-bold">Longitude:</span>
-                    {{ location.longitude.toFixed(6) }}
-                  </p>
                 </div>
               </div>
             </div>
