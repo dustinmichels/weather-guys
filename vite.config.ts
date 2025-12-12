@@ -6,6 +6,10 @@ import vueDevTools from 'vite-plugin-vue-devtools'
 
 // https://vite.dev/config/
 export default defineConfig({
+  server: {
+    allowedHosts: ['c69f24a779d0.ngrok-free.app'],
+    host: true,
+  },
   plugins: [vue(), vueDevTools()],
   resolve: {
     alias: {

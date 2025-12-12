@@ -107,7 +107,8 @@ const getWeatherIcon = (code: number): string => {
       <div class="columns is-centered">
         <div class="column is-8-tablet is-6-desktop">
           <div class="box has-text-centered">
-            <h1 class="title is-2 has-text-primary mb-5">Location Finder</h1>
+            <h1 class="title is-2 has-text-primary mb-5">Who are you?</h1>
+            <h3>By Dustin</h3>
 
             <button
               @click="handleReady"
