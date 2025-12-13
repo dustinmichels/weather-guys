@@ -1,39 +1,11 @@
-export interface GeocodeAddress {
-  city?: string
-  town?: string
-  village?: string
-  municipality?: string
-  county?: string
-  state?: string
-  country?: string
-  country_code?: string
-  postcode?: string
-  [key: string]: any
-}
-
-export interface GeocodeResult {
-  place_id: number
-  licence: string
-  osm_type: string
-  osm_id: number
-  lat: string
-  lon: string
-  display_name: string
-  address: GeocodeAddress
-  boundingbox: string[]
-}
-
 /**
  * Reverse geocode coordinates to get city/address information
  * Uses OpenStreetMap Nominatim API
- * @param latitude - Latitude coordinate
- * @param longitude - Longitude coordinate
- * @returns Promise with geocoding result or null if failed
+ * @param {number} latitude - Latitude coordinate
+ * @param {number} longitude - Longitude coordinate
+ * @returns {Promise<Object|null>} Promise with geocoding result or null if failed
  */
-export async function reverseGeocode(
-  latitude: number,
-  longitude: number,
-): Promise<GeocodeResult | null> {
+export async function reverseGeocode(latitude, longitude) {
   try {
     const response = await fetch(
       `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`,
@@ -49,7 +21,7 @@ export async function reverseGeocode(
       throw new Error(`HTTP error! status: ${response.status}`)
     }
 
-    const data: GeocodeResult = await response.json()
+    const data = await response.json()
     return data
   } catch (error) {
     console.error('Reverse geocoding error:', error)
@@ -60,10 +32,10 @@ export async function reverseGeocode(
 /**
  * Extract city name from geocoding result
  * Tries multiple fields in order of preference
- * @param result - Geocoding result from reverseGeocode
- * @returns City name or 'Unknown' if not found
+ * @param {Object|null} result - Geocoding result from reverseGeocode
+ * @returns {string} City name or 'Unknown' if not found
  */
-export function getCityFromResult(result: GeocodeResult | null): string {
+export function getCityFromResult(result) {
   if (!result?.address) return 'Unknown'
 
   return (
@@ -77,13 +49,13 @@ export function getCityFromResult(result: GeocodeResult | null): string {
 
 /**
  * Get full location string from geocoding result
- * @param result - Geocoding result from reverseGeocode
- * @returns Formatted location string
+ * @param {Object|null} result - Geocoding result from reverseGeocode
+ * @returns {string} Formatted location string
  */
-export function getFullLocationFromResult(result: GeocodeResult | null): string {
+export function getFullLocationFromResult(result) {
   if (!result?.address) return 'Unknown'
 
-  const parts: string[] = []
+  const parts = []
 
   const city = getCityFromResult(result)
   if (city !== 'Unknown') parts.push(city)

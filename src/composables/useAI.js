@@ -4,11 +4,11 @@ import { LOCATION_STEREOTYPE_PROMPT } from '../prompts'
 import { ERROR_MESSAGES } from '../constants'
 
 export const useAI = () => {
-  const aiResponse = ref<string | null>(null)
+  const aiResponse = ref(null)
   const aiLoading = ref(false)
-  const aiService = ref<AIService | null>(null)
+  const aiService = ref(null)
 
-  const initializeAI = (apiKey: string): boolean => {
+  const initializeAI = (apiKey) => {
     if (!AIService.isApiKeyValid(apiKey)) {
       aiResponse.value = ERROR_MESSAGES.INVALID_API_KEY
       return false
@@ -23,7 +23,7 @@ export const useAI = () => {
     }
   }
 
-  const generateResponse = async (location: string, customPrompt?: string): Promise<void> => {
+  const generateResponse = async (location, customPrompt) => {
     if (!location) {
       aiResponse.value = ERROR_MESSAGES.NO_LOCATION_PROVIDED
       return

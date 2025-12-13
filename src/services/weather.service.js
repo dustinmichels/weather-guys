@@ -1,30 +1,10 @@
-export interface WeatherData {
-  temperature: number
-  weatherCode: number
-  windSpeed: number
-  humidity: number
-  precipitation: number
-  isDay: boolean
-}
-
-export interface WeatherResponse {
-  current: {
-    temperature_2m: number
-    relative_humidity_2m: number
-    precipitation: number
-    weather_code: number
-    wind_speed_10m: number
-    is_day: number
-  }
-}
-
 /**
  * Fetch current weather data from Open-Meteo API
- * @param latitude - Location latitude
- * @param longitude - Location longitude
- * @returns Weather data
+ * @param {number} latitude - Location latitude
+ * @param {number} longitude - Location longitude
+ * @returns {Promise<Object>} Weather data
  */
-export async function getCurrentWeather(latitude: number, longitude: number): Promise<WeatherData> {
+export async function getCurrentWeather(latitude, longitude) {
   const url = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,relative_humidity_2m,precipitation,weather_code,wind_speed_10m,is_day&temperature_unit=celsius&wind_speed_unit=kmh`
 
   const response = await fetch(url)
@@ -33,7 +13,7 @@ export async function getCurrentWeather(latitude: number, longitude: number): Pr
     throw new Error('Failed to fetch weather data')
   }
 
-  const data: WeatherResponse = await response.json()
+  const data = await response.json()
 
   return {
     temperature: data.current.temperature_2m,
@@ -47,11 +27,11 @@ export async function getCurrentWeather(latitude: number, longitude: number): Pr
 
 /**
  * Get weather description from WMO weather code
- * @param code - WMO weather code
- * @returns Weather description
+ * @param {number} code - WMO weather code
+ * @returns {string} Weather description
  */
-export function getWeatherDescription(code: number): string {
-  const weatherCodes: Record<number, string> = {
+export function getWeatherDescription(code) {
+  const weatherCodes = {
     0: 'Clear sky',
     1: 'Mainly clear',
     2: 'Partly cloudy',
@@ -87,11 +67,11 @@ export function getWeatherDescription(code: number): string {
 
 /**
  * Get weather icon based on weather code and time of day
- * @param code - WMO weather code
- * @param isDay - Whether it's daytime
- * @returns Font Awesome icon class
+ * @param {number} code - WMO weather code
+ * @param {boolean} isDay - Whether it's daytime
+ * @returns {string} Font Awesome icon class
  */
-export function getWeatherIcon(code: number, isDay: boolean): string {
+export function getWeatherIcon(code, isDay) {
   // Clear/Mainly clear
   if (code === 0 || code === 1) {
     return isDay ? 'fa-sun' : 'fa-moon'
@@ -147,28 +127,28 @@ export function getWeatherIcon(code: number, isDay: boolean): string {
 
 /**
  * Check if it's currently raining based on weather code
- * @param code - WMO weather code
- * @returns true if raining
+ * @param {number} code - WMO weather code
+ * @returns {boolean} true if raining
  */
-export function isRaining(code: number): boolean {
+export function isRaining(code) {
   return (code >= 51 && code <= 67) || (code >= 80 && code <= 82)
 }
 
 /**
  * Check if it's cloudy based on weather code
- * @param code - WMO weather code
- * @returns true if cloudy
+ * @param {number} code - WMO weather code
+ * @returns {boolean} true if cloudy
  */
-export function isCloudy(code: number): boolean {
+export function isCloudy(code) {
   return code >= 2 && code <= 3
 }
 
 /**
  * Check if it's sunny based on weather code
- * @param code - WMO weather code
- * @param isDay - Whether it's daytime
- * @returns true if sunny
+ * @param {number} code - WMO weather code
+ * @param {boolean} isDay - Whether it's daytime
+ * @returns {boolean} true if sunny
  */
-export function isSunny(code: number, isDay: boolean): boolean {
+export function isSunny(code, isDay) {
   return (code === 0 || code === 1) && isDay
 }

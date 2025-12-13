@@ -1,4 +1,4 @@
-<script setup lang="ts"></script>
+<script setup></script>
 
 <template>
   <div class="character-container">
@@ -44,6 +44,7 @@
 .character {
   position: relative;
   animation: bounce 2s ease-in-out infinite;
+  transform-style: preserve-3d;
 }
 
 /* Bounce animation */
@@ -62,11 +63,18 @@
   position: relative;
   width: 80px;
   height: 80px;
-  background-color: #ffd700;
+  background: radial-gradient(
+    circle at 30% 30%,
+    #ffed4e,
+    #ffd700 40%,
+    #f4c430 70%,
+    #daa520 100%
+  );
   border-radius: 50%;
   border: 3px solid #333;
   margin: 0 auto;
   z-index: 2;
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
 }
 
 /* Eyes */
@@ -79,7 +87,7 @@
 .eye {
   width: 16px;
   height: 16px;
-  background-color: white;
+  background: radial-gradient(circle at 35% 35%, #ffffff, #f5f5f5 50%, #d0d0d0 100%);
   border-radius: 50%;
   border: 2px solid #333;
   position: relative;
@@ -88,7 +96,7 @@
 .pupil {
   width: 8px;
   height: 8px;
-  background-color: #333;
+  background: radial-gradient(circle at 35% 35%, #4a4a4a, #2a2a2a 50%, #000000 100%);
   border-radius: 50%;
   position: absolute;
   top: 50%;
@@ -107,18 +115,27 @@
   border: 2px solid #333;
   border-top: none;
   border-radius: 0 0 30px 30px;
+  background: radial-gradient(ellipse at center, rgba(200, 0, 0, 0.3), transparent);
+  box-shadow: inset 0 -2px 4px rgba(0, 0, 0, 0.2);
 }
 
 /* Body */
 .body {
   width: 60px;
   height: 70px;
-  background-color: #4a90e2;
+  background: radial-gradient(
+    ellipse at 30% 25%,
+    #6db3ff,
+    #5ba3f5 30%,
+    #4a90e2 60%,
+    #3574b8 100%
+  );
   border-radius: 30px 30px 20px 20px;
   border: 3px solid #333;
   margin: -5px auto 0;
   position: relative;
   z-index: 1;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.25);
 }
 
 /* Arms */
@@ -133,10 +150,16 @@
 .arm {
   width: 30px;
   height: 8px;
-  background-color: #ffd700;
+  background: radial-gradient(
+    ellipse at 30% 40%,
+    #ffed4e,
+    #ffd700 50%,
+    #e6c200 100%
+  );
   border: 2px solid #333;
   border-radius: 10px;
   position: absolute;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
 }
 
 .left-arm {
@@ -162,8 +185,15 @@
 .leg {
   width: 20px;
   height: 35px;
-  background-color: #e74c3c;
+  background: radial-gradient(
+    ellipse at 35% 20%,
+    #ff7b6a,
+    #ff6b5a 40%,
+    #e74c3c 70%,
+    #c0392b 100%
+  );
   border: 3px solid #333;
   border-radius: 0 0 10px 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.25);
 }
 </style>

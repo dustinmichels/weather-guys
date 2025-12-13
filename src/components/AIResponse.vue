@@ -1,11 +1,14 @@
-<script setup lang="ts">
-defineProps<{
-  response: string
-}>()
+<script setup>
+defineProps({
+  response: {
+    type: String,
+    required: true
+  }
+})
 </script>
 
 <template>
-  <div class="box has-background-success-light mt-4">
+  <div class="box has-background-success-light">
     <div class="content has-text-left">
       <p>{{ response }}</p>
     </div>

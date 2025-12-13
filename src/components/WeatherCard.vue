@@ -1,6 +1,5 @@
-<script setup lang="ts">
+<script setup>
 import { computed } from 'vue'
-import type { WeatherData } from '../services/weather.service'
 import {
   getWeatherDescription,
   getWeatherIcon,
@@ -9,13 +8,15 @@ import {
   isSunny,
 } from '../services/weather.service'
 
-interface Props {
-  weather: WeatherData
-  loading?: boolean
-}
-
-const props = withDefaults(defineProps<Props>(), {
-  loading: false,
+const props = defineProps({
+  weather: {
+    type: Object,
+    required: true
+  },
+  loading: {
+    type: Boolean,
+    default: false
+  }
 })
 
 const description = computed(() => getWeatherDescription(props.weather.weatherCode))

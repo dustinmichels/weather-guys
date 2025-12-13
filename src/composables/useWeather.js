@@ -1,12 +1,12 @@
 import { computed, ref } from 'vue'
-import { getCurrentWeather, type WeatherData } from '../services/weather.service'
+import { getCurrentWeather } from '../services/weather.service'
 
 export function useWeather() {
-  const weather = ref<WeatherData | null>(null)
+  const weather = ref(null)
   const loading = ref(false)
-  const error = ref<string | null>(null)
+  const error = ref(null)
 
-  const fetchWeather = async (latitude: number, longitude: number) => {
+  const fetchWeather = async (latitude, longitude) => {
     loading.value = true
     error.value = null
 

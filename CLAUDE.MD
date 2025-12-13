@@ -2,12 +2,12 @@
 
 ## Project Overview
 
-**weather-guys** is a Vue 3 + TypeScript web application that provides weather information with AI-powered commentary. The app gets the user's location, fetches current weather data, and generates conversational weather summaries using Google's Generative AI.
+**weather-guys** is a Vue 3 + JavaScript web application that provides weather information with AI-powered commentary. The app gets the user's location, fetches current weather data, and generates conversational weather summaries using Google's Generative AI.
 
 ## Tech Stack
 
 - **Frontend Framework**: Vue 3 (Composition API with `<script setup>`)
-- **Language**: TypeScript
+- **Language**: JavaScript
 - **Build Tool**: Vite
 - **Styling**: Bulma CSS framework + SASS
 - **AI Integration**: Google Generative AI (`@google/genai`)
@@ -20,22 +20,23 @@
 ```
 src/
 ├── App.vue                    # Main application component
-├── main.ts                    # Application entry point
+├── main.js                    # Application entry point
 ├── components/
+│   ├── AIResponse.vue         # AI response display component
+│   ├── AnimatedCharacter.vue  # CSS-based animated character
+│   ├── ThreeJSCharacter.vue   # Three.js 3D character
 │   └── WeatherCard.vue        # Weather display component
 ├── composables/
-│   ├── useAI.ts              # AI service composable
-│   ├── useLocation.ts        # Geolocation composable
-│   └── useWeather.ts         # Weather data composable
+│   ├── useAI.js              # AI service composable
+│   ├── useLocation.js        # Geolocation composable
+│   └── useWeather.js         # Weather data composable
 ├── services/
-│   ├── ai.service.ts         # Google AI integration
-│   └── weather.service.ts    # Weather API integration
-├── types/
-│   └── index.ts              # TypeScript type definitions
+│   ├── ai.service.js         # Google AI integration
+│   └── weather.service.js    # Weather API integration
 ├── constants/
-│   └── index.ts              # App constants
-├── geocoding.ts              # Location name resolution
-└── prompts.ts                # AI prompt templates
+│   └── index.js              # App constants
+├── geocoding.js              # Location name resolution
+└── prompts.js                # AI prompt templates
 ```
 
 ## Key Features
@@ -59,9 +60,6 @@ bun install
 
 # Start development server
 bun dev
-
-# Type check
-bun run type-check
 
 # Build for production
 bun run build
@@ -99,7 +97,7 @@ The app uses Vue 3 composables for reusable logic:
 
 ### Google Generative AI
 
-- **Model**: Configured in `ai.service.ts`
+- **Model**: Configured in `ai.service.js`
 - **Purpose**: Generate conversational weather commentary
 - **Authentication**: API key via environment variable
 
@@ -109,14 +107,6 @@ The app uses Vue 3 composables for reusable logic:
 - SASS for custom styles
 - Font Awesome for icons
 - Responsive design patterns
-
-## TypeScript Configuration
-
-- Strict type checking enabled
-- Separate configs for app and node environments:
-  - `tsconfig.app.json`: Application code
-  - `tsconfig.node.json`: Vite config
-  - `tsconfig.json`: Root configuration
 
 ## Code Style
 

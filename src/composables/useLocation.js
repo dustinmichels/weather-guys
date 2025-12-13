@@ -1,16 +1,15 @@
 import { ref } from 'vue'
 import { getCityFromResult, getFullLocationFromResult, reverseGeocode } from '../geocoding'
-import type { LocationData } from '../types'
 import { ERROR_MESSAGES } from '../constants'
 
 export const useLocation = () => {
-  const location = ref<LocationData | null>(null)
-  const city = ref<string | null>(null)
-  const fullLocation = ref<string | null>(null)
-  const error = ref<string | null>(null)
+  const location = ref(null)
+  const city = ref(null)
+  const fullLocation = ref(null)
+  const error = ref(null)
   const loading = ref(false)
 
-  const getLocation = async (): Promise<void> => {
+  const getLocation = async () => {
     if (!navigator.geolocation) {
       error.value = ERROR_MESSAGES.GEOLOCATION_NOT_SUPPORTED
       return

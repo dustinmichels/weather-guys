@@ -3,7 +3,7 @@ export const AI_CONFIG = {
   DEFAULT_MODEL: 'gemini-2.0-flash-exp',
   API_KEY_ENV: 'VITE_GOOGLE_AI_KEY',
   API_KEY_URL: 'https://ai.google.dev/',
-} as const
+}
 
 // Error Messages
 export const ERROR_MESSAGES = {
@@ -12,7 +12,7 @@ export const ERROR_MESSAGES = {
   AI_NOT_INITIALIZED: 'AI service not initialized',
   INVALID_API_KEY:
     '⚠️ Please set your VITE_GOOGLE_AI_KEY in the .env file. Get your API key from https://ai.google.dev/',
-} as const
+}
 
 // UI Text
 export const UI_TEXT = {
@@ -25,4 +25,4 @@ export const UI_TEXT = {
   SECTION_COORDINATES: 'Coordinates:',
   LABEL_LATITUDE: 'Latitude:',
   LABEL_LONGITUDE: 'Longitude:',
-} as const
+}

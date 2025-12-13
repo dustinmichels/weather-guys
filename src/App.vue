@@ -1,7 +1,7 @@
-<script setup lang="ts">
+<script setup>
 import { onMounted, ref } from 'vue'
 import AIResponse from './components/AIResponse.vue'
-import AnimatedCharacter from './components/AnimatedCharacter.vue'
+import ThreeJSCharacter from './components/ThreeJSCharacter.vue'
 import { useAI } from './composables/useAI'
 import { useLocation } from './composables/useLocation'
 
@@ -9,9 +9,9 @@ const { location, city, fullLocation, error, loading, getLocation, clearError } 
 
 const { aiResponse, aiLoading, initializeAI, generateResponse } = useAI()
 
-const weather = ref<any>(null)
+const weather = ref(null)
 const weatherLoading = ref(false)
-const weatherError = ref<string | null>(null)
+const weatherError = ref(null)
 
 // Initialize on mount
 onMounted(() => {
@@ -20,7 +20,7 @@ onMounted(() => {
   initializeAI(apiKey)
 })
 
-const fetchWeather = async (lat: number, lon: number) => {
+const fetchWeather = async (lat, lon) => {
   weatherLoading.value = true
   weatherError.value = null
 
@@ -63,8 +63,8 @@ const handleReady = async () => {
   }
 }
 
-const getWeatherDescription = (code: number): string => {
-  const weatherCodes: Record<number, string> = {
+const getWeatherDescription = (code) => {
+  const weatherCodes = {
     0: 'Clear sky',
     1: 'Mainly clear',
     2: 'Partly cloudy',
@@ -93,7 +93,7 @@ const getWeatherDescription = (code: number): string => {
   return weatherCodes[code] || 'Unknown'
 }
 
-const getWeatherIcon = (code: number): string => {
+const getWeatherIcon = (code) => {
   if (code === 0 || code === 1) return 'fa-sun'
   if (code === 2 || code === 3) return 'fa-cloud-sun'
   if (code >= 45 && code <= 48) return 'fa-smog'
@@ -158,6 +158,14 @@ const getWeatherIcon = (code: number): string => {
                 <p class="subtitle is-6 has-text-grey">{{ fullLocation }}</p>
               </div>
 
+              <!-- AI Response with Character -->
+              <div v-if="aiResponse" class="mt-4">
+                <div class="character-wrapper">
+                  <ThreeJSCharacter />
+                </div>
+                <AIResponse :response="aiResponse" />
+              </div>
+
               <!-- Weather Information -->
               <div v-if="weather" class="box has-background-info-light mt-4">
                 <p class="title is-5 has-text-info mb-4">
@@ -214,16 +222,6 @@ const getWeatherIcon = (code: number): string => {
                   </div>
                 </div>
               </div>
-
-              <!-- AI Response with Character -->
-              <div v-if="aiResponse" class="columns is-variable is-4">
-                <div class="column is-narrow">
-                  <AnimatedCharacter />
-                </div>
-                <div class="column">
-                  <AIResponse :response="aiResponse" />
-                </div>
-              </div>
             </div>
           </div>
         </div>
@@ -233,5 +231,11 @@ const getWeatherIcon = (code: number): string => {
 </template>
 
 <style scoped>
-/* Optional: Add any custom styles here if needed */
+.character-wrapper {
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: -1rem;
+}
 </style>
