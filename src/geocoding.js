@@ -1,3 +1,5 @@
+import { MOCK_CONFIG } from './config/mock.config'
+
 /**
  * Reverse geocode coordinates to get city/address information
  * Uses OpenStreetMap Nominatim API
@@ -6,6 +8,16 @@
  * @returns {Promise<Object|null>} Promise with geocoding result or null if failed
  */
 export async function reverseGeocode(latitude, longitude) {
+  // Check if MOCK_CITY mode is enabled
+  const isMockCity = import.meta.env.VITE_MOCK_CITY === 'true'
+
+  if (isMockCity) {
+    console.log('[MOCK MODE] Using mock geocoding data')
+    // Simulate network delay
+    await new Promise((resolve) => setTimeout(resolve, MOCK_CONFIG.DELAYS.geocoding))
+    return MOCK_CONFIG.CITY.geocodeResult
+  }
+
   try {
     const response = await fetch(
       `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`,

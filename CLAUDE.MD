@@ -33,6 +33,8 @@ src/
 ├── services/
 │   ├── ai.service.js         # Google AI integration
 │   └── weather.service.js    # Weather API integration
+├── config/
+│   └── mock.config.js        # Mock mode configuration and data
 ├── constants/
 │   └── index.js              # App constants
 ├── geocoding.js              # Location name resolution
@@ -45,12 +47,26 @@ src/
 2. **Weather Fetching**: Retrieves current weather data from Open-Meteo API
 3. **AI Commentary**: Generates conversational weather summaries using Google AI
 4. **Responsive UI**: Bulma-based responsive design
+5. **Mock Mode**: Comprehensive mock mode for development/testing without API calls
+   - Individual mock controls for geocoding, weather, and AI
+   - Multiple weather scenarios (sunny, rainy, snowy, etc.)
+   - Configurable mock data and responses
 
 ## Environment Variables
 
 Required environment variables (stored in `.env`):
 
 - `VITE_GOOGLE_AI_KEY`: Google Generative AI API key
+
+Optional mock mode variables (for development/testing):
+
+- `VITE_MOCK_CITY`: Mock geocoding API (true/false)
+- `VITE_MOCK_WEATHER`: Mock weather API (true/false)
+- `VITE_MOCK_WEATHER_SCENARIO`: Weather scenario (default/sunny/rainy/snowy/thunderstorm/random)
+- `VITE_MOCK_AI`: Mock AI API (true/false)
+- `VITE_MOCK_AI_RANDOM`: Random AI responses (true/false)
+
+See `.env.example` and `MOCK_MODE.md` for detailed mock mode documentation
 
 ## Development Commands
 

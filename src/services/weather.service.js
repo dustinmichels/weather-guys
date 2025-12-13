@@ -1,3 +1,5 @@
+import { MOCK_CONFIG, getMockWeather } from '../config/mock.config.js'
+
 /**
  * Fetch current weather data from Open-Meteo API
  * @param {number} latitude - Location latitude
@@ -5,6 +7,28 @@
  * @returns {Promise<Object>} Weather data
  */
 export async function getCurrentWeather(latitude, longitude) {
+  // Check if MOCK_WEATHER mode is enabled
+  const isMockWeather = import.meta.env.VITE_MOCK_WEATHER === 'true'
+
+  if (isMockWeather) {
+    console.log('[MOCK MODE] Using mock weather data')
+    // Simulate network delay
+    await new Promise((resolve) => setTimeout(resolve, MOCK_CONFIG.DELAYS.weather))
+
+    // Get mock weather scenario from env or use default
+    const scenario = import.meta.env.VITE_MOCK_WEATHER_SCENARIO || 'default'
+    const mockData = getMockWeather(scenario)
+
+    return {
+      temperature: mockData.temperature_2m,
+      weatherCode: mockData.weather_code,
+      windSpeed: mockData.wind_speed_10m,
+      humidity: mockData.relative_humidity_2m,
+      precipitation: mockData.precipitation,
+      isDay: mockData.is_day === 1,
+    }
+  }
+
   const url = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,relative_humidity_2m,precipitation,weather_code,wind_speed_10m,is_day&temperature_unit=celsius&wind_speed_unit=kmh`
 
   const response = await fetch(url)

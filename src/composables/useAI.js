@@ -1,7 +1,8 @@
 import { ref } from 'vue'
-import { AIService, createAIService } from '../services/ai.service'
-import { LOCATION_STEREOTYPE_PROMPT } from '../prompts'
+import { MOCK_CONFIG, getRandomMockAIResponse } from '../config/mock.config.js'
 import { ERROR_MESSAGES } from '../constants'
+import { LOCATION_STEREOTYPE_PROMPT } from '../prompts'
+import { AIService, createAIService } from '../services/ai.service'
 
 export const useAI = () => {
   const aiResponse = ref(null)
@@ -29,18 +30,20 @@ export const useAI = () => {
       return
     }
 
-    // Check if MOCK mode is enabled
-    const isMockMode = import.meta.env.VITE_MOCK === 'true'
+    // Check if MOCK_AI mode is enabled
+    const isMockAI = import.meta.env.VITE_MOCK_AI === 'true'
 
-    if (isMockMode) {
+    if (isMockAI) {
+      console.log('[MOCK MODE] Using mock AI response')
       aiLoading.value = true
       aiResponse.value = null
 
-      // Simulate a brief delay to mimic API call
-      await new Promise((resolve) => setTimeout(resolve, 500))
+      // Simulate AI thinking delay
+      await new Promise((resolve) => setTimeout(resolve, MOCK_CONFIG.DELAYS.ai))
 
-      const mockResponse = `Oh, you're from ${location}. That means you probably cycle everywhere in a tweed jacket, argue about the correct pronunciation of "scone," and have a punt with a tragic love story attached to it.`
-      aiResponse.value = mockResponse
+      // Use random mock response or configured one
+      const useRandom = import.meta.env.VITE_MOCK_AI_RANDOM === 'true'
+      aiResponse.value = useRandom ? getRandomMockAIResponse() : MOCK_CONFIG.AI.response
 
       aiLoading.value = false
       return
